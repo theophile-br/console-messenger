@@ -1,16 +1,3 @@
-// CONFIG
-// const carnet = [
-// "192.168.232.87",
-// "192.168.128.197",
-// "192.168.128.95",
-//     //OTHER IP HERE :)
-// ]
-
-const carnet = []
-
-const SECRET_KEY = 'vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3';
-const HELLO_WORLD = "HELLO";
-const OK = "OK :)";
 // IMPORT
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
@@ -23,27 +10,11 @@ const rl = readline.createInterface({ input, output });
 const algorithm = 'aes-256-ctr';
 const iv = crypto.randomBytes(16);
 
-// FUNC UTILS
-const getMyLocalAdd = () => {
-    var networkInterfaces = os.networkInterfaces();
-    return Object.entries(networkInterfaces).map(el => el[1]).flat().filter(el => el.family === 'IPv4').find(el => { return el.address !== "127.0.0.1" && el.address !== "localhost" }).address
-}
-var myLocalAddr = getMyLocalAdd()
-
-const encrypt = (data) => {
-    const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
-    const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-    return {
-        iv: iv.toString('hex'),
-        content: encrypted.toString('hex')
-    };
-} 
-
-const decrypt = (hash) => {
-    const decipher = crypto.createDecipheriv(algorithm, SECRET_KEY, Buffer.from(hash.iv, 'hex'));
-    const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
-    return decrpyted.toString()        
-}
+// CONFIG
+const carnet = []
+const SECRET_KEY = 'vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3';
+const HELLO_WORLD = "HELLO";
+const OK = "OK :)";
 
 // VAR
 const YOU = "YOU"
@@ -54,26 +25,50 @@ const port = 41234;
 
 // IF NO ARGS
 if (!pseudo) {
-    console.log("missing args")
+    console.log("missing args -p {{your-pseudo}}")
     process.exit()
+}
+
+// FUNC UTILS
+const getMyLocalAdd = () => {
+    var networkInterfaces = os.networkInterfaces();
+    return Object.entries(networkInterfaces).map(el => el[1]).flat().filter(el => el.family === 'IPv4').find(el => { return el.address !== "127.0.0.1" && el.address !== "localhost" }).address
+}
+var myLocalAddr = getMyLocalAdd()
+
+// ENCRYPT FUNCTION
+const encrypt = (data) => {
+    const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
+    const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
+    return JSON.stringify({
+        iv: iv.toString('hex'),
+        content: encrypted.toString('hex')
+    });
+} 
+
+const decrypt = (hash) => {
+    hash = JSON.parse(hash)
+    const decipher = crypto.createDecipheriv(algorithm, SECRET_KEY, Buffer.from(hash.iv, 'hex'));
+    const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
+    return decrpyted.toString()        
 }
 
 // WHEN YOU RECIEVE MESSAGE
 server.on('message', (buf, senderInfo) => {
-    const msg = '' + buf
+    const data = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
-    if(msg === HELLO_WORLD){
+    if(data === HELLO_WORLD){
         server.send(OK,port,senderInfo.address)
         return;
     }
-    if(msg === OK)
+    if(data === OK)
         return;
     const mem = rl.line
     rl.line = ""
     readline.clearLine(process.stdin, 0)
     readline.cursorTo(process.stdin, 0)
     rl.pause();
-    console.log('' + msg)
+    console.log(decrypt(data))
     rl.write(mem)
     rl.resume();
 });
@@ -84,6 +79,7 @@ rl.on("line", (data) => {
     readline.clearLine(process.stdin, 0)
     if (data !== SCAN_CMD) {
         console.log(`${YOU} : ${data}`)
+        data = encrypt(data)
         for (const dest of carnet) {
             if(dest === myLocalAddr)
                 continue;
@@ -140,7 +136,7 @@ const netscan = async () => {
         server.send(HELLO_WORLD, port, a)
     })
     await setTimeout(() => {
-        console.log(carnet)
+        console.log(`${carnet.length} camarade(s) found !`)
     },2000)
 }
 
