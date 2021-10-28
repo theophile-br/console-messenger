@@ -36,7 +36,7 @@ const getMyLocalAdd = () => {
 }
 var myLocalAddr = getMyLocalAdd()
 
-// ENCRYPT FUNCTION
+// CODEC FUNCTION
 const encrypt = (data) => {
     const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
     const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
@@ -58,11 +58,14 @@ server.on('message', (buf, senderInfo) => {
     const data = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
     if(data === HELLO_WORLD){
+        console.log("new camarade incomming !!")
         server.send(OK,port,senderInfo.address)
         return;
     }
-    if(data === OK)
+    if(data === OK){
+        console.log("new camarade incomming !!")
         return;
+    }
     const mem = rl.line
     rl.line = ""
     readline.clearLine(process.stdin, 0)
@@ -117,27 +120,30 @@ server.on('listening', async () => {
     console.clear();
     console.log(`My Local adresse IP is ${myLocalAddr}`)
     await netscan()
-    console.log("Write Something...");
 });
 
 // NET SCAN
 const netscan = async () => {
+    console.log("scaning network please wait..")
+    let progress = 0;
+    let max = 255;
     const ip = "192.168"
-    const allIp = [];
-    for (let i = 1; i < 255; i++) {
-        for (let j = 1; j < 255; j++) {
+    const promises = [];
+    for (let i = 1; i < max; i++) {
+        for (let j = 1; j < max; j++) {
             const a = `${ip}.${i}.${j}`
             if (myLocalAddr === a)
                 continue
-            allIp.push(a)
+            promises.push(new Promise((resolve) => server.send(HELLO_WORLD, port,a,() => {
+                progress++
+                process.stdout.write(`\r${Math.ceil((100 * progress) / ((max * max) - 1))} %`)
+                resolve()
+            })))
         }
     }
-    allIp.map((a) => {
-        server.send(HELLO_WORLD, port, a)
-    })
-    await setTimeout(() => {
-        console.log(`${carnet.length} camarade(s) found !`)
-    },2000)
+    await Promise.all(promises)
+    console.log(`${carnet.length} camarade(s) found !`)
+    console.log("Write Something...");
 }
 
 // CARNET UPDATE METHOD
