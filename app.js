@@ -58,12 +58,10 @@ server.on('message', (buf, senderInfo) => {
     const data = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
     if(data === HELLO_WORLD){
-        console.log("new camarade incomming !")
         server.send(OK,port,senderInfo.address)
         return;
     }
     if(data === OK){
-        console.log("new camarade incomming !")
         return;
     }
     const mem = rl.line
@@ -155,6 +153,7 @@ const ifAddrInCarnetRemoveIt = (a) => {
 
 const ifAddrNotInCarnetAddIt = (a) => {
     if (!carnet.includes(a)) {
+        console.log("new camarade incomming !")
         carnet.push(a)
     }
 }
