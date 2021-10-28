@@ -79,7 +79,7 @@ rl.on("line", (data) => {
     readline.clearLine(process.stdin, 0)
     if (data !== SCAN_CMD) {
         console.log(`${YOU} : ${data}`)
-        data = encrypt(`${pseudo}: ${data}`)
+        data = encrypt(`${pseudo} : ${data}`)
         for (const dest of carnet) {
             if(dest === myLocalAddr)
                 continue;
