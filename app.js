@@ -62,7 +62,7 @@ if (!pseudo) {
 server.on('message', (buf, senderInfo) => {
     const msg = '' + buf
     if(msg === HELLO_WORLD){
-        server.send(OK,senderInfo.address)
+        server.send(OK,port,senderInfo.address)
     }
     if(msg === OK){
         ifAddrNotInCarnetAddItAndSendOK(senderInfo.address)
@@ -118,10 +118,7 @@ server.bind(port);
 server.on('listening', async () => {
     console.clear();
     console.log(`My Local adresse IP is ${myLocalAddr}`)
-    console.log("start")
     await netscan()
-    console.log("finish")
-    console.log(carnet)
     console.log("Write Something...");
 });
 
@@ -141,7 +138,7 @@ const netscan = async () => {
         server.send("HELLO", port, a)
     })
     await setTimeout(() => {
-
+        console.log(carnet)
     },2000)
 }
 
