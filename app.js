@@ -62,9 +62,11 @@ if (!pseudo) {
 server.on('message', (buf, senderInfo) => {
     const msg = '' + buf
     if(msg === HELLO_WORLD){
+        console.log("HELLO")
         server.send(OK,port,senderInfo.address)
     }
     if(msg === OK){
+        console.log("OK")
         ifAddrNotInCarnetAddItAndSendOK(senderInfo.address)
     }
     console.log(carnet)
