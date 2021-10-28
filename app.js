@@ -1,17 +1,29 @@
+// CONFIG
+// const carnet = [
+// "192.168.232.87",
+// "192.168.128.197",
+// "192.168.128.95",
+//     //OTHER IP HERE :)
+// ]
+
+const carnet = []
+
+const SECRET_KEY = 'vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3';
+const HELLO_WORLD = "HELLO";
+const OK = "OK :)";
 // IMPORT
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const readline = require('readline');
 var os = require('os');
 const crypto = require('crypto');
-
 const { stdin: input, stdout: output } = require('process');
+
 const rl = readline.createInterface({ input, output });
 const algorithm = 'aes-256-ctr';
-const secretKey = 'vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3';
 const iv = crypto.randomBytes(16);
-//192.168.232.87
-//192.168.128.197
+
+// FUNC UTILS
 const getMyLocalAdd = () => {
     var networkInterfaces = os.networkInterfaces();
     return Object.entries(networkInterfaces).map(el => el[1]).flat().filter(el => el.family === 'IPv4').find(el => { return el.address !== "127.0.0.1" && el.address !== "localhost" }).address
@@ -19,7 +31,7 @@ const getMyLocalAdd = () => {
 var myLocalAddr = getMyLocalAdd()
 
 const encrypt = (data) => {
-    const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
+    const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
     const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
     return {
         iv: iv.toString('hex'),
@@ -28,7 +40,7 @@ const encrypt = (data) => {
 } 
 
 const decrypt = (hash) => {
-    const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(hash.iv, 'hex'));
+    const decipher = crypto.createDecipheriv(algorithm, SECRET_KEY, Buffer.from(hash.iv, 'hex'));
     const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
     return decrpyted.toString()        
 }
@@ -39,7 +51,6 @@ const SCAN_CMD = "/scan"
 let pos = process.argv.indexOf("-n");
 const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 const port = 41234;
-const carnet = [];
 
 // IF NO ARGS
 if (!pseudo) {
@@ -48,8 +59,15 @@ if (!pseudo) {
 }
 
 // WHEN YOU RECIEVE MESSAGE
-server.on('message', (msg, senderInfo) => {
-    ifAddrNotInCarnetAddIt(senderInfo.address)
+server.on('message', (buf, senderInfo) => {
+    const msg = '' + buf
+    if(msg === HELLO_WORLD){
+        server.send(OK,senderInfo.address)
+    }
+    if(msg === OK){
+        ifAddrNotInCarnetAddItAndSendOK(senderInfo.address)
+    }
+    console.log(carnet)
     const mem = rl.line
     rl.line = ""
     readline.clearLine(process.stdin, 0)
@@ -69,17 +87,11 @@ rl.on("line", (data) => {
         for (const dest of carnet) {
             server.send(`${pseudo}: ${data}`, port, dest, (err, i) => {
                 if (err) {
-                    if (err.code === "EADDRNOTAVAIL") {
-                        ifAddrInCarnetRemoveIt(a)
-                    } else {
-                        console.log(err)
-                    }
-                    return;
+                    console.log(err);
                 }
             })
         }
     } else {
-        console.log(data)
         netscan()
     }
 
@@ -103,34 +115,34 @@ rl.on('close', () => {
 
 // LISTENING
 server.bind(port);
-server.on('listening', () => {
+server.on('listening', async () => {
     console.clear();
     console.log(`My Local adresse IP is ${myLocalAddr}`)
-    //server.addMembership('224.0.0.114');
-    server.send("COUCOU",port)
+    console.log("start")
+    await netscan()
+    console.log("finish")
+    console.log(carnet)
     console.log("Write Something...");
 });
 
 // NET SCAN
 const netscan = async () => {
     const ip = "192.168"
+    const allIp = [];
     for (let i = 1; i < 255; i++) {
         for (let j = 1; j < 255; j++) {
             const a = `${ip}.${i}.${j}`
             if (myLocalAddr === a)
                 continue
-            console.log(a)
-            server.emit
-            // server.send("HELLO", port, a, (err, i) => {
-            //     if (err) {
-            //         ifAddrInCarnetRemoveIt(a)
-            //         return;
-            //     }
-            //     ifAddrNotInCarnetAddIt(a)
-            // })
+            allIp.push(a)
         }
     }
-    console.log(`${carnet.length} camarade found`)
+    allIp.map((a) => {
+        server.send("HELLO", port, a)
+    })
+    await setTimeout(() => {
+
+    },2000)
 }
 
 // CARNET UPDATE METHOD
@@ -140,7 +152,7 @@ const ifAddrInCarnetRemoveIt = (a) => {
     }
 }
 
-const ifAddrNotInCarnetAddIt = (a) => {
+const ifAddrNotInCarnetAddItAndSendOK = (a) => {
     if (!carnet.includes(a)) {
         carnet.push(a)
     }
