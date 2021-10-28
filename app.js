@@ -63,13 +63,11 @@ server.on('message', (buf, senderInfo) => {
     const msg = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
     if(msg === HELLO_WORLD){
-        console.log("HELLO")
         server.send(OK,port,senderInfo.address)
         return;
     }
     if(msg === OK)
         return;
-    console.log(carnet)
     const mem = rl.line
     rl.line = ""
     readline.clearLine(process.stdin, 0)
