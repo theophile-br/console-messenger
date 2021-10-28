@@ -58,12 +58,12 @@ server.on('message', (buf, senderInfo) => {
     const data = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
     if(data === HELLO_WORLD){
-        console.log("new camarade incomming !!")
+        console.log("new camarade incomming !")
         server.send(OK,port,senderInfo.address)
         return;
     }
     if(data === OK){
-        console.log("new camarade incomming !!")
+        console.log("new camarade incomming !")
         return;
     }
     const mem = rl.line
@@ -142,7 +142,7 @@ const netscan = async () => {
         }
     }
     await Promise.all(promises)
-    console.log(`${carnet.length} camarade(s) found !`)
+    process.stdout.write(`\n${carnet.length} camarade(s) found !\n`)
     console.log("Write Something...");
 }
 
