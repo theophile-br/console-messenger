@@ -61,14 +61,14 @@ if (!pseudo) {
 // WHEN YOU RECIEVE MESSAGE
 server.on('message', (buf, senderInfo) => {
     const msg = '' + buf
+    ifAddrNotInCarnetAddIt(senderInfo.address)
     if(msg === HELLO_WORLD){
         console.log("HELLO")
         server.send(OK,port,senderInfo.address)
+        return;
     }
-    if(msg === OK){
-        console.log("OK")
-        ifAddrNotInCarnetAddItAndSendOK(senderInfo.address)
-    }
+    if(msg === OK)
+        return;
     console.log(carnet)
     const mem = rl.line
     rl.line = ""
@@ -87,6 +87,8 @@ rl.on("line", (data) => {
     if (data !== SCAN_CMD) {
         console.log(`${YOU} : ${data}`)
         for (const dest of carnet) {
+            if(dest === myLocalAddr)
+                continue;
             server.send(`${pseudo}: ${data}`, port, dest, (err, i) => {
                 if (err) {
                     console.log(err);
@@ -137,7 +139,7 @@ const netscan = async () => {
         }
     }
     allIp.map((a) => {
-        server.send("HELLO", port, a)
+        server.send(HELLO_WORLD, port, a)
     })
     await setTimeout(() => {
         console.log(carnet)
@@ -151,7 +153,7 @@ const ifAddrInCarnetRemoveIt = (a) => {
     }
 }
 
-const ifAddrNotInCarnetAddItAndSendOK = (a) => {
+const ifAddrNotInCarnetAddIt = (a) => {
     if (!carnet.includes(a)) {
         carnet.push(a)
     }
