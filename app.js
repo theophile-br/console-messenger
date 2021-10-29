@@ -2,10 +2,12 @@
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const readline = require('readline');
-var os = require('os');
+const os = require('os');
+const path = require("path");
+const fs = require("fs")
 const crypto = require('crypto');
 const { stdin: input, stdout: output } = require('process');
-
+// os.homedir()
 const rl = readline.createInterface({ input, output });
 const algorithm = 'aes-256-ctr';
 const iv = crypto.randomBytes(16);
@@ -15,9 +17,12 @@ const carnet = []
 const SECRET_KEY = 'vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3';
 const HELLO_WORLD = "HELLO";
 const OK = "OK :)";
+const CONF_FILE = "conf.json"
 
 // VAR
 const YOU = "YOU"
+const pathToConf = path.join(process.argv[1], "..", "cool")
+const fullPathToConf = path.join(pathToConf, CONF_FILE)
 const SCAN_CMD = "/scan"
 let pos = process.argv.indexOf("-n");
 const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
@@ -26,10 +31,17 @@ const port = 41234;
 // IF NO ARGS
 if (!pseudo) {
     console.log("missing args -p {{your-pseudo}}")
-    process.exit()
 }
 
 // FUNC UTILS
+if (!fs.existsSync(pathToConf)) {
+    fs.mkdirSync(pathToConf, { recursive: true })
+    fs.closeSync()
+}
+fs.writeFileSync(pathToConf, "OK")
+
+console.log()
+process.exit()
 const getMyLocalAdd = () => {
     var networkInterfaces = os.networkInterfaces();
     return Object.entries(networkInterfaces).map(el => el[1]).flat().filter(el => el.family === 'IPv4').find(el => { return el.address !== "127.0.0.1" && el.address !== "localhost" }).address
@@ -44,25 +56,25 @@ const encrypt = (data) => {
         iv: iv.toString('hex'),
         content: encrypted.toString('hex')
     });
-} 
+}
 
 const decrypt = (hash) => {
     hash = JSON.parse(hash)
     const decipher = crypto.createDecipheriv(algorithm, SECRET_KEY, Buffer.from(hash.iv, 'hex'));
     const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
-    return decrpyted.toString()        
+    return decrpyted.toString()
 }
 
 // WHEN YOU RECIEVE MESSAGE
 server.on('message', (buf, senderInfo) => {
     const data = '' + buf
     ifAddrNotInCarnetAddIt(senderInfo.address)
-    if(data === HELLO_WORLD){
+    if (data === HELLO_WORLD) {
         console.log("new camarade incomming !")
-        server.send(OK,port,senderInfo.address)
+        server.send(OK, port, senderInfo.address)
         return;
     }
-    if(data === OK){
+    if (data === OK) {
         return;
     }
     const mem = rl.line
@@ -83,7 +95,7 @@ rl.on("line", (data) => {
         console.log(`${YOU} : ${data}`)
         data = encrypt(`${pseudo} : ${data}`)
         for (const dest of carnet) {
-            if(dest === myLocalAddr)
+            if (dest === myLocalAddr)
                 continue;
             server.send(data, port, dest, (err, i) => {
                 if (err) {
@@ -133,7 +145,7 @@ const netscan = async () => {
             const a = `${ip}.${i}.${j}`
             if (myLocalAddr === a)
                 continue
-            promises.push(new Promise((resolve) => server.send(HELLO_WORLD, port,a,() => {
+            promises.push(new Promise((resolve) => server.send(HELLO_WORLD, port, a, () => {
                 progress++
                 process.stdout.write(`\r${Math.ceil((100 * progress) / ((max * max) - 1))} %`)
                 resolve()
