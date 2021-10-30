@@ -40,8 +40,6 @@ if (!fs.existsSync(pathToConf)) {
 }
 fs.writeFileSync(pathToConf, "OK")
 
-console.log()
-process.exit()
 const getMyLocalAdd = () => {
     var networkInterfaces = os.networkInterfaces();
     return Object.entries(networkInterfaces).map(el => el[1]).flat().filter(el => el.family === 'IPv4').find(el => { return el.address !== "127.0.0.1" && el.address !== "localhost" }).address
