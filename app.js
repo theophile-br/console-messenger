@@ -88,7 +88,7 @@ server.on("message", (buf, senderInfo) => {
   readline.clearLine(process.stdin, 0);
   readline.cursorTo(process.stdin, 0);
   rl.pause();
-  console.log(decrypt(data));
+  console.log(data.content);
   rl.write(mem);
   rl.resume();
 });
