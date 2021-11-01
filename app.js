@@ -21,8 +21,6 @@ const CONF_FILE = "conf.json";
 
 // VAR
 const YOU = "YOU";
-const pathToConf = path.join(process.argv[1], "..", "cool");
-const fullPathToConf = path.join(pathToConf, CONF_FILE);
 const SCAN_CMD = "/scan";
 let pos = process.argv.indexOf("-n");
 const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
@@ -168,13 +166,6 @@ const netscan = async () => {
   await Promise.all(promises);
   process.stdout.write(`\n${carnet.length} camarade(s) found !\n`);
   console.log("Write Something...");
-};
-
-// CARNET UPDATE METHOD
-const ifAddrInCarnetRemoveIt = (a) => {
-  if (carnet.includes(a)) {
-    carnet = carnet.filter(el !== a);
-  }
 };
 
 const ifAddrNotInCarnetAddIt = (a) => {
