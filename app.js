@@ -58,6 +58,8 @@ const encrypt = (data) => {
 
 const decrypt = (hash) => {
   hash = JSON.parse(hash);
+  console.log(hash.iv);
+  console.log(hash);
   const decipher = crypto.createDecipheriv(
     algorithm,
     SECRET_KEY,
@@ -150,7 +152,7 @@ const netscan = async () => {
       if (myLocalAddr === a) continue;
       promises.push(
         new Promise((resolve) =>
-          server.send(JSON.stringify(hash), port, a, () => {
+          server.send(hash, port, a, () => {
             progress++;
             process.stdout.write(
               `\r${Math.ceil((100 * progress) / (max * max - 1))} %`
