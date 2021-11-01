@@ -14,9 +14,9 @@ const iv = crypto.randomBytes(16);
 const carnet = [];
 const SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3";
 const CODE = {
-  HELLO = "HELLO",
-  MESSAGE = "MSG"
-}
+  HELLO: "HELLO",
+  MESSAGE: "MSG",
+};
 
 // VAR
 const YOU = "YOU";
@@ -71,11 +71,16 @@ const decrypt = (hash) => {
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const data = JSON.parse(decrypt("" + buf));
+  const msg = "" + buf;
+  const data = JSON.parse(decrypt(msg));
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
     console.log("new camarade incomming !");
-    server.send(JSON.stringify({code:CODE.MESSAGE,content: `${pseudo} is here`}), port, senderInfo.address);
+    server.send(
+      JSON.stringify({ code: CODE.MESSAGE, content: `${pseudo} is here` }),
+      port,
+      senderInfo.address
+    );
     return;
   }
   const mem = rl.line;
@@ -94,7 +99,9 @@ rl.on("line", (data) => {
   readline.clearLine(process.stdin, 0);
   if (data !== SCAN_CMD) {
     console.log(`${YOU} : ${data}`);
-    data = encrypt({code: CODE.MESSAGE, content: `${pseudo} : ${data}`});
+    data = encrypt(
+      JSON.stringify({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` })
+    );
     for (const dest of carnet) {
       if (dest === myLocalAddr) continue;
       server.send(data, port, dest, (err, i) => {
@@ -139,7 +146,9 @@ const netscan = async () => {
   let max = 255;
   const ip = "192.168";
   const promises = [];
-  const hash = encrypt({code: CODE.HELLO, content:""})
+  const hash = JSON.stringify(
+    encrypt(JSON.stringify({ code: CODE.HELLO, content: "" }))
+  );
   for (let i = 1; i < max; i++) {
     for (let j = 1; j < max; j++) {
       const a = `${ip}.${i}.${j}`;
