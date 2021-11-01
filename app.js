@@ -71,11 +71,9 @@ const decrypt = (hash) => {
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const msg = "" + buf;
-  const data = JSON.parse(decrypt(msg));
+  const data = JSON.parse(decrypt(buf));
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
-    console.log("new camarade incomming !");
     server.send(
       JSON.stringify({ code: CODE.MESSAGE, content: `${pseudo} is here` }),
       port,
