@@ -71,7 +71,7 @@ const decrypt = (hash) => {
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const data = JSON.parse(decrypt(buf));
+  const data = JSON.parse(decrypt("" + buf));
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
     server.send(
