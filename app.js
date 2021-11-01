@@ -47,15 +47,17 @@ var myLocalAddr = getMyLocalAdd();
 
 // CODEC FUNCTION
 const encrypt = (data) => {
+  data = JSON.stringify(data);
   const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
   const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-  return {
+  return JSON.stringify({
     iv: iv.toString("hex"),
     content: encrypted.toString("hex"),
-  };
+  });
 };
 
 const decrypt = (hash) => {
+  hash = JSON.parse(hash);
   const decipher = crypto.createDecipheriv(
     algorithm,
     SECRET_KEY,
@@ -65,18 +67,16 @@ const decrypt = (hash) => {
     decipher.update(Buffer.from(hash.content, "hex")),
     decipher.final(),
   ]);
-  return decrpyted.toString();
+  return JSON.parse(decrpyted.toString());
 };
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const data = JSON.parse(decrypt(JSON.parse("" + buf)));
+  const data = decrypt("" + buf);
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
     server.send(
-      JSON.stringify(
-        encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here` })
-      ),
+      encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here` }),
       port,
       senderInfo.address
     );
@@ -101,7 +101,7 @@ rl.on("line", (data) => {
     data = encrypt({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` });
     for (const dest of carnet) {
       if (dest === myLocalAddr) continue;
-      server.send(JSON.stringify(data), port, dest, (err, i) => {
+      server.send(data, port, dest, (err, i) => {
         if (err) {
           console.log(err);
         }
@@ -143,7 +143,7 @@ const netscan = async () => {
   let max = 255;
   const ip = "192.168";
   const promises = [];
-  const hash = encrypt(JSON.stringify({ code: CODE.HELLO, content: "" }));
+  const hash = encrypt({ code: CODE.HELLO, content: "" });
   for (let i = 1; i < max; i++) {
     for (let j = 1; j < max; j++) {
       const a = `${ip}.${i}.${j}`;
