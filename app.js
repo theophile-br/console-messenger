@@ -3,11 +3,9 @@ const dgram = require("dgram");
 const server = dgram.createSocket("udp4");
 const readline = require("readline");
 const os = require("os");
-const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const { stdin: input, stdout: output } = require("process");
-// os.homedir()
 const rl = readline.createInterface({ input, output });
 const algorithm = "aes-256-ctr";
 const iv = crypto.randomBytes(16);
@@ -15,13 +13,16 @@ const iv = crypto.randomBytes(16);
 // CONFIG
 const carnet = [];
 const SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rdgs01LwHzfR3";
-const HELLO_WORLD = "HELLO";
-const OK = "OK :)";
-const CONF_FILE = "conf.json";
+const CODE = {
+  HELLO = "HELLO",
+  MESSAGE = "MSG"
+}
 
 // VAR
 const YOU = "YOU";
 const SCAN_CMD = "/scan";
+
+// ARG PARSE
 let pos = process.argv.indexOf("-n");
 const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 const port = 41234;
@@ -32,11 +33,6 @@ if (!pseudo) {
 }
 
 // FUNC UTILS
-if (!fs.existsSync(pathToConf)) {
-  fs.mkdirSync(pathToConf, { recursive: true });
-  fs.closeSync();
-}
-
 const getMyLocalAdd = () => {
   var networkInterfaces = os.networkInterfaces();
   return Object.entries(networkInterfaces)
@@ -53,10 +49,10 @@ var myLocalAddr = getMyLocalAdd();
 const encrypt = (data) => {
   const cipher = crypto.createCipheriv(algorithm, SECRET_KEY, iv);
   const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-  return JSON.stringify({
+  return {
     iv: iv.toString("hex"),
     content: encrypted.toString("hex"),
-  });
+  };
 };
 
 const decrypt = (hash) => {
@@ -75,14 +71,11 @@ const decrypt = (hash) => {
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const data = "" + buf;
+  const data = JSON.parse(decrypt("" + buf));
   ifAddrNotInCarnetAddIt(senderInfo.address);
-  if (data === HELLO_WORLD) {
+  if (data.code === CODE.HELLO) {
     console.log("new camarade incomming !");
-    server.send(OK, port, senderInfo.address);
-    return;
-  }
-  if (data === OK) {
+    server.send(JSON.stringify({code:CODE.MESSAGE,content: `${pseudo} is here`}), port, senderInfo.address);
     return;
   }
   const mem = rl.line;
@@ -101,7 +94,7 @@ rl.on("line", (data) => {
   readline.clearLine(process.stdin, 0);
   if (data !== SCAN_CMD) {
     console.log(`${YOU} : ${data}`);
-    data = encrypt(`${pseudo} : ${data}`);
+    data = encrypt({code: CODE.MESSAGE, content: `${pseudo} : ${data}`});
     for (const dest of carnet) {
       if (dest === myLocalAddr) continue;
       server.send(data, port, dest, (err, i) => {
@@ -117,7 +110,7 @@ rl.on("line", (data) => {
 
 // IF YOU CLOSE (CTRL^C)
 server.on("close", () => {
-  console.log("server stop");
+  console.log("program stop");
   process.exit();
 });
 
@@ -127,7 +120,7 @@ server.on("error", (err) => {
 });
 
 rl.on("close", () => {
-  console.log("readline stop");
+  console.log("program stop");
   process.exit();
 });
 
@@ -146,13 +139,14 @@ const netscan = async () => {
   let max = 255;
   const ip = "192.168";
   const promises = [];
+  const hash = encrypt({code: CODE.HELLO, content:""})
   for (let i = 1; i < max; i++) {
     for (let j = 1; j < max; j++) {
       const a = `${ip}.${i}.${j}`;
       if (myLocalAddr === a) continue;
       promises.push(
         new Promise((resolve) =>
-          server.send(HELLO_WORLD, port, a, () => {
+          server.send(hash, port, a, () => {
             progress++;
             process.stdout.write(
               `\r${Math.ceil((100 * progress) / (max * max - 1))} %`
