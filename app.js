@@ -56,7 +56,6 @@ const encrypt = (data) => {
 };
 
 const decrypt = (hash) => {
-  hash = JSON.parse(hash);
   const decipher = crypto.createDecipheriv(
     algorithm,
     SECRET_KEY,
