@@ -28,7 +28,7 @@ const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 const port = 41234;
 
 // IF NO ARGS
-if (!pseudo) {
+if (pseudo === undefined) {
   console.log("missing args -p {{your-pseudo}}");
 }
 
@@ -71,11 +71,15 @@ const decrypt = (hash) => {
 
 // WHEN YOU RECIEVE MESSAGE
 server.on("message", (buf, senderInfo) => {
-  const data = JSON.parse(decrypt("" + buf));
+  console.log(buf);
+  console.log("" + buf);
+  const data = JSON.parse(decrypt(JSON.parse("" + buf)));
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
     server.send(
-      JSON.stringify({ code: CODE.MESSAGE, content: `${pseudo} is here` }),
+      JSON.stringify(
+        encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here` })
+      ),
       port,
       senderInfo.address
     );
@@ -97,12 +101,10 @@ rl.on("line", (data) => {
   readline.clearLine(process.stdin, 0);
   if (data !== SCAN_CMD) {
     console.log(`${YOU} : ${data}`);
-    data = encrypt(
-      JSON.stringify({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` })
-    );
+    data = encrypt({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` });
     for (const dest of carnet) {
       if (dest === myLocalAddr) continue;
-      server.send(data, port, dest, (err, i) => {
+      server.send(JSON.stringify(data), port, dest, (err, i) => {
         if (err) {
           console.log(err);
         }
@@ -144,16 +146,14 @@ const netscan = async () => {
   let max = 255;
   const ip = "192.168";
   const promises = [];
-  const hash = JSON.stringify(
-    encrypt(JSON.stringify({ code: CODE.HELLO, content: "" }))
-  );
+  const hash = encrypt(JSON.stringify({ code: CODE.HELLO, content: "" }));
   for (let i = 1; i < max; i++) {
     for (let j = 1; j < max; j++) {
       const a = `${ip}.${i}.${j}`;
       if (myLocalAddr === a) continue;
       promises.push(
         new Promise((resolve) =>
-          server.send(hash, port, a, () => {
+          server.send(JSON.stringify(hash), port, a, () => {
             progress++;
             process.stdout.write(
               `\r${Math.ceil((100 * progress) / (max * max - 1))} %`
