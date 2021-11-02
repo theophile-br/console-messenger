@@ -23,7 +23,7 @@ const YOU = "YOU";
 const SCAN_CMD = "/scan";
 
 // ARG PARSE
-let pos = process.argv.indexOf("-n");
+let pos = process.argv.indexOf("-p");
 const pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 const port = 41234;
 
