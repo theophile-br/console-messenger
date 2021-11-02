@@ -58,8 +58,6 @@ const encrypt = (data) => {
 
 const decrypt = (hash) => {
   hash = JSON.parse(hash);
-  console.log(hash.iv);
-  console.log(hash);
   const decipher = crypto.createDecipheriv(
     algorithm,
     SECRET_KEY,
@@ -78,7 +76,7 @@ server.on("message", (buf, senderInfo) => {
   ifAddrNotInCarnetAddIt(senderInfo.address);
   if (data.code === CODE.HELLO) {
     server.send(
-      encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here` }),
+      encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here !` }),
       port,
       senderInfo.address
     );
@@ -164,7 +162,7 @@ const netscan = async () => {
     }
   }
   await Promise.all(promises);
-  process.stdout.write(`\n${carnet.length} camarade(s) found !\n`);
+  //process.stdout.write(`\n${carnet.length} camarade(s) found !\n`);
   console.log("Write Something...");
 };
 
