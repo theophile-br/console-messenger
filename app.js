@@ -30,6 +30,7 @@ const port = 41234;
 // IF NO ARGS
 if (pseudo === undefined) {
   console.log("missing args -p {{your-pseudo}}");
+  process.exit();
 }
 
 // FUNC UTILS
