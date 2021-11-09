@@ -50,6 +50,8 @@ const main = () => {
   // WHEN YOU RECIEVE MESSAGE
   server.on("message", (buf, senderInfo) => {
     const data = decrypt("" + buf);
+    if(senderInfo.address === getMyLocalAdd() || senderInfo.address === "127.0.0.1")
+      return;
     ifAddrNotInCarnetAddIt(senderInfo.address);
     if (data.code === CODE.HELLO) {
       server.send(
@@ -143,40 +145,8 @@ const decrypt = (hash) => {
 // NET SCAN
 const netscan = async () => {
   console.log("scaning network please wait..");
-  let progress = 0;
-  let max = 255;
-  const nbrOfAddr = Math.pow(2,32 - parseInt(myMask))
-  let ip = "";
-  const a = new Array(parseInt(myMask)).fill(1).concat(new Array(32 - parseInt(myMask)).fill(0))
-  const ipBit = [a.slice(0,8),a.slice(8,16),a.slice(16,24),a.slice(24,32)]
-  const myLocalAddrSplit = myLocalAddr.split(".")
-  for(let i = 0; i < ipBit.length; i++) {
-    if(binToDec(ipBit[i].join("")) === 255) {
-      ip += "" + myLocalAddrSplit[i] + "."
-    } else {
-      
-    }
-  }
-  //console.log(nbrOfAddr)
-  //console.log(ip)
-  const promises = [];
   const hash = encrypt({ code: CODE.HELLO, content: "" });
-  for (let i = 1; i < max; i++) {
-      const a = `${ip}.${i}`;
-      if (myLocalAddr === a) continue;
-      promises.push(
-        new Promise((resolve) =>
-          server.send(hash, port, a, () => {
-            progress++;
-            process.stdout.write(
-              `\r${Math.ceil((100 * progress) / (max - 1))} %`
-            );
-            resolve();
-          })
-        )
-      );
-  }
-  await Promise.all(promises);
+  server.send(hash,port)
   console.log("\nWrite Something...\n");
 };
 
