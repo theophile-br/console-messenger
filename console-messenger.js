@@ -38,19 +38,22 @@ const main = () => {
 
   // RETRIVE NETWORK INFO
   try {
-    var addr = getMyLocalAdd().split("/")
+    var addr = getMyLocalAdd().split("/");
   } catch {
-    console.log("no network available")
-    process.exit()
+    console.log("no network available");
+    process.exit();
   }
 
-  myLocalAddr = addr[0] ;
-  myMask = addr[1] ;
+  myLocalAddr = addr[0];
+  myMask = addr[1];
 
   // WHEN YOU RECIEVE MESSAGE
   server.on("message", (buf, senderInfo) => {
     const data = decrypt("" + buf);
-    if(senderInfo.address === getMyLocalAdd() || senderInfo.address === "127.0.0.1")
+    if (
+      senderInfo.address === getMyLocalAdd() ||
+      senderInfo.address === "127.0.0.1"
+    )
       return;
     ifAddrNotInCarnetAddIt(senderInfo.address);
     if (data.code === CODE.HELLO) {
@@ -146,18 +149,19 @@ const decrypt = (hash) => {
 const netscan = async () => {
   console.log("scaning network please wait..");
   const hash = encrypt({ code: CODE.HELLO, content: "" });
-  server.send(hash,port)
+  server.setBroadcast(true);
+  server.send(hash, port, "192.168.1.255");
   console.log("\nWrite Something...\n");
 };
 
 //CONVERSION
 const binToDec = (binary) => {
-  return parseInt(binary, 2)
-}
+  return parseInt(binary, 2);
+};
 
 const decToBin = (dec) => {
-  return (parseInt(myMask)).toString(2)
-}
+  return parseInt(myMask).toString(2);
+};
 
 // ADD IP TO CARNET
 const ifAddrNotInCarnetAddIt = (a) => {
