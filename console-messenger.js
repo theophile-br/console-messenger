@@ -17,6 +17,7 @@ const SCAN_CMD = "/scan";
 const port = 41234;
 let pseudo = "";
 let myLocalAddr = "";
+let networkBroadcastAddr = ""
 let myMask = "";
 
 // ENUM
@@ -39,23 +40,24 @@ const main = () => {
   // RETRIVE NETWORK INFO
   try {
     var addr = getMyLocalAdd().split("/");
+    myLocalAddr = addr[0];
+    myMask = addr[1];
+    networkBroadcastAddr = getBroadcastAddr()
   } catch {
     console.log("no network available");
     process.exit();
   }
 
-  myLocalAddr = addr[0];
-  myMask = addr[1];
-
   // WHEN YOU RECIEVE MESSAGE
   server.on("message", (buf, senderInfo) => {
-    const data = decrypt("" + buf);
     if (
-      senderInfo.address === getMyLocalAdd() ||
+      senderInfo.address === myLocalAddr ||
       senderInfo.address === "127.0.0.1"
-    )
+    ){
       return;
+    }
     ifAddrNotInCarnetAddIt(senderInfo.address);
+    const data = decrypt("" + buf);
     if (data.code === CODE.HELLO) {
       server.send(
         encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here !` }),
@@ -113,6 +115,7 @@ const main = () => {
   // LISTENING
   server.bind(port);
   server.on("listening", async () => {
+    server.setBroadcast(true);
     console.clear();
     console.log(`My Local adresse IP is ${myLocalAddr}/${myMask}`);
     await netscan();
@@ -149,8 +152,7 @@ const decrypt = (hash) => {
 const netscan = async () => {
   console.log("scaning network please wait..");
   const hash = encrypt({ code: CODE.HELLO, content: "" });
-  server.setBroadcast(true);
-  server.send(hash, port, "192.168.1.255");
+  server.send(hash, port, networkBroadcastAddr);
   console.log("\nWrite Something...\n");
 };
 
@@ -180,6 +182,10 @@ const getMyLocalAdd = () => {
     .find((el) => {
       return el.address !== "127.0.0.1" && el.address !== "localhost";
     }).cidr;
+};
+
+const getBroadcastAddr = () => {
+  return "192.168.1.255"
 };
 
 // LAUNCH PRG
