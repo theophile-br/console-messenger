@@ -1,3 +1,4 @@
+#!/usr/bin/node
 // IMPORT
 const dgram = require("dgram");
 const server = dgram.createSocket("udp4");
