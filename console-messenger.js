@@ -59,6 +59,7 @@ const main = () => {
     }
     ifAddrNotInCarnetAddIt(senderInfo.address);
     const data = decrypt("" + buf);
+    process.stdout.write('\x07'); // Make Sound with Bell System
     if (data.code === CODE.HELLO) {
       server.send(
         encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here !` }),
