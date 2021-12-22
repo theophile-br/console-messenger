@@ -54,7 +54,7 @@ const main = () => {
     if (
       senderInfo.address === myLocalAddr ||
       senderInfo.address === "127.0.0.1"
-    ){
+    ) {
       return;
     }
     ifAddrNotInCarnetAddIt(senderInfo.address);
@@ -119,6 +119,7 @@ const main = () => {
     server.setBroadcast(true);
     console.clear();
     console.log(`My Local adresse IP is ${myLocalAddr}/${myMask}`);
+    console.log(`My BroadcastAddr is ${networkBroadcastAddr}`)
     await netscan();
   });
 };
@@ -174,19 +175,26 @@ const ifAddrNotInCarnetAddIt = (a) => {
 };
 
 // GET LOCAL IP
-const getMyLocalAdd = () => {
+
+const getAddrInfo = () => {
   var networkInterfaces = os.networkInterfaces();
   return Object.entries(networkInterfaces)
     .map((el) => el[1])
     .flat()
-    .filter((el) => el.family === "IPv4")
-    .find((el) => {
+    .filter((el) => el.family === "IPv4").find((el) => {
       return el.address !== "127.0.0.1" && el.address !== "localhost";
-    }).cidr;
+    })
+}
+
+const getMyLocalAdd = () => {
+  return getAddrInfo().cidr;
 };
 
 const getBroadcastAddr = () => {
-  return "192.168.1.255"
+  const addr_info = getAddrInfo();
+  var addr_splitted = addr_info.address.split('.');
+  var netmask_splitted = addr_info.netmask.split('.');
+  return addr_splitted.map((e, i) => (~netmask_splitted[i] & 0xFF) | e).join('.');
 };
 
 // LAUNCH PRG
