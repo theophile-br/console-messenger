@@ -12,11 +12,13 @@ const iv = crypto.randomBytes(16);
 
 // CONFIG
 const carnet = [];
-const SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rgsd01LwHzfR3";
+let SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rgsd01LwHzfR3";
 const YOU = "YOU";
 const SCAN_CMD = "/scan";
 const port = 41234;
 let pseudo = "";
+let silent = false;
+let room = undefined;
 let myLocalAddr = "";
 let networkBroadcastAddr = ""
 let myMask = "";
@@ -32,10 +34,20 @@ const main = () => {
   let pos = process.argv.indexOf("-p");
   pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 
+  pos = process.argv.indexOf("-r");
+  room = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
+
+  pos = process.argv.indexOf("-s");
+  silent = pos !== -1
+
   // IF NO ARGS
   if (pseudo === undefined) {
     console.log("missing args -p {{your-pseudo}}");
     process.exit();
+  }
+
+  if (room === undefined) {
+    room = "BASIC"
   }
 
   // RETRIVE NETWORK INFO
@@ -59,7 +71,9 @@ const main = () => {
     }
     ifAddrNotInCarnetAddIt(senderInfo.address);
     const data = decrypt("" + buf);
-    process.stdout.write('\x07'); // Make Sound with Bell System
+    if (!silent) {
+      process.stdout.write('\x07'); // Make Sound with Bell System
+    }
     if (data.code === CODE.HELLO) {
       server.send(
         encrypt({ code: CODE.MESSAGE, content: `${pseudo} is here !` }),
