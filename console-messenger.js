@@ -18,7 +18,7 @@ const SCAN_CMD = "/scan";
 const port = 41234;
 let pseudo = "";
 let silent = false;
-let room = undefined;
+let room = "";
 let myLocalAddr = "";
 let networkBroadcastAddr = ""
 let myMask = "";
@@ -35,7 +35,7 @@ const main = () => {
   pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 
   pos = process.argv.indexOf("-r");
-  room = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
+  room = pos === -1 ? "" : process.argv[pos + 1].toUpperCase();
 
   pos = process.argv.indexOf("-s");
   silent = pos !== -1
@@ -46,8 +46,12 @@ const main = () => {
     process.exit();
   }
 
-  if (room === undefined) {
-    room = "BASIC"
+  // CALCULATE ROOM SECRET
+  let arraySecretChar = [...SECRET_KEY]
+  for (let i = 0; i < room.length; i++) {
+    const index = i % SECRET_KEY.length
+    arraySecretChar[index] = room[i]
+    SECRET_KEY = arraySecretChar.join('')
   }
 
   // RETRIVE NETWORK INFO
@@ -133,6 +137,9 @@ const main = () => {
   server.on("listening", async () => {
     server.setBroadcast(true);
     console.clear();
+    if (room !== "") {
+      console.log(`Enter un room ${room}`);
+    }
     console.log(`My Local adresse IP is ${myLocalAddr}/${myMask}`);
     console.log(`My BroadcastAddr is ${networkBroadcastAddr}`)
     await netscan();
