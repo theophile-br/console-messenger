@@ -84,7 +84,7 @@ const sendMessage = (data) => {
     netscan();
     return;
   }
-  
+
   console.log(`${YOU} : ${data}`);
   const encriptedData = encrypt({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` });
   for (const dest of carnet) {
