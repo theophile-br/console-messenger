@@ -29,8 +29,7 @@ const CODE = {
   MESSAGE: "MSG",
 };
 
-// ARG PARSE
-const main = () => {
+const argParser = () => {
   let pos = process.argv.indexOf("-p");
   pseudo = pos === -1 ? undefined : process.argv[pos + 1].toUpperCase();
 
@@ -39,22 +38,27 @@ const main = () => {
 
   pos = process.argv.indexOf("-s");
   silent = pos !== -1
+}
 
+const initChecker = () => {
+  argParser();
   // IF NO ARGS
-  if (pseudo === undefined) {
+  if (!pseudo) {
     console.log("missing args -p {{your-pseudo}}");
     process.exit();
   }
+}
 
-  // CALCULATE ROOM SECRET
+const computeSecretRoom = () => {
   let arraySecretChar = [...SECRET_KEY]
   for (let i = 0; i < room.length; i++) {
     const index = i % SECRET_KEY.length
     arraySecretChar[index] = room[i]
     SECRET_KEY = arraySecretChar.join('')
   }
+}
 
-  // RETRIVE NETWORK INFO
+const getNetworkInfo = () => {
   try {
     var addr = getMyLocalAdd().split("/");
     myLocalAddr = addr[0];
@@ -64,7 +68,46 @@ const main = () => {
     console.log("no network available");
     process.exit();
   }
+}
 
+const initConsoleMessenger = () => {
+  initChecker();
+  computeSecretRoom();
+  getNetworkInfo();
+}
+
+const sendMessage = (data) => {
+  readline.moveCursor(process.stdin, 0, -1);
+  readline.clearLine(process.stdin, 0);
+
+  if (data === SCAN_CMD) {
+    netscan();
+    return;
+  }
+  
+  console.log(`${YOU} : ${data}`);
+  const encriptedData = encrypt({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` });
+  for (const dest of carnet) {
+    if (dest === myLocalAddr) continue;
+    server.send(encriptedData, port, dest, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+}
+
+const setReadLineListeners = () => {
+  // WHEN YOU PRESS ENTER (SEND MESSAGE)
+  rl.on("line", sendMessage);
+
+  rl.on("close", () => {
+    console.log("program stop");
+    process.exit();
+  });
+}
+
+const setServerListerners = () => {
   // WHEN YOU RECIEVE MESSAGE
   server.on("message", (buf, senderInfo) => {
     if (
@@ -96,26 +139,6 @@ const main = () => {
     rl.resume();
   });
 
-  // WHEN YOU PRESS ENTER (SEND MESSAGE)
-  rl.on("line", (data) => {
-    readline.moveCursor(process.stdin, 0, -1);
-    readline.clearLine(process.stdin, 0);
-    if (data !== SCAN_CMD) {
-      console.log(`${YOU} : ${data}`);
-      data = encrypt({ code: CODE.MESSAGE, content: `${pseudo} : ${data}` });
-      for (const dest of carnet) {
-        if (dest === myLocalAddr) continue;
-        server.send(data, port, dest, (err, i) => {
-          if (err) {
-            console.log(err);
-          }
-        });
-      }
-    } else {
-      netscan();
-    }
-  });
-
   // IF YOU CLOSE (CTRL^C)
   server.on("close", () => {
     console.log("program stop");
@@ -127,13 +150,6 @@ const main = () => {
     server.close();
   });
 
-  rl.on("close", () => {
-    console.log("program stop");
-    process.exit();
-  });
-
-  // LISTENING
-  server.bind(port);
   server.on("listening", async () => {
     server.setBroadcast(true);
     console.clear();
@@ -144,6 +160,18 @@ const main = () => {
     console.log(`My BroadcastAddr is ${networkBroadcastAddr}`)
     await netscan();
   });
+}
+
+const setAllListeners = () => {
+  setReadLineListeners();
+  setServerListerners();
+  // LISTENING
+  server.bind(port);
+}
+
+const main = () => {
+  initConsoleMessenger();
+  setAllListeners();
 };
 
 // CODEC FUNCTION
