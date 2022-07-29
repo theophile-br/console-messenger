@@ -3,6 +3,6 @@ export abstract class Configuration {
   room?: string;
   silent?: boolean;
   load(): void {
-    throw new Error("Methode Not Implemented");
+    throw new Error("Method Not Implemented");
   }
 }
