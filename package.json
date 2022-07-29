@@ -2,9 +2,9 @@
   "name": "template",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "node dist/main.js",
     "build:dev": "npx tsc",
     "build:prod": "npx tsc --project tsconfig-prod.json",
     "test": "npx jest",
