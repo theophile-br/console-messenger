@@ -1,11 +1,6 @@
-export interface IConfigurationLoader {
-  pseudo?: string;
-  room?: string;
-  silent?: boolean;
-  load(): void;
-}
+import { Configuration } from "./configuration";
 
-export class ArgParseConfig implements IConfigurationLoader {
+export class ArgParseConfig extends Configuration {
   pseudo?: string;
   room?: string;
   silent?: boolean;

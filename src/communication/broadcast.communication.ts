@@ -1,31 +1,23 @@
 import dgram from "dgram";
 import { EventEmitter } from "stream";
-import { IConfigurationLoader } from "../config/argparse.config";
-import { CryptoCodec } from "../cryptography/cipher.crypto";
+import { Configuration } from "../configuration/configuration";
+import { Cryptography } from "../cryptography/cyptography";
 import { NetUtils } from "../utils/net.utils";
+import { Communication } from "./communication";
+import { CommunicationEvent } from "./communication.enum";
 
 const CODE = {
   HELLO: "HELLO",
   MESSAGE: "MSG",
 };
 
-export enum CommunicationEvent {
-  ERROR = "0",
-  MESSAGE = "1",
-  LISTENING = "2",
-  CLOSE = "3",
-}
-
-export class BroadcastCommunication {
+export class BroadcastCommunication extends Communication {
   private server = dgram.createSocket("udp4");
   private port = 41234;
   private carnet: string[] = [];
-  public readonly event = new EventEmitter();
 
-  constructor(
-    private crypto: CryptoCodec,
-    private config: IConfigurationLoader
-  ) {
+  constructor(crypto: Cryptography, config: Configuration) {
+    super(crypto, config);
     this.server.on("message", (buf, senderInfo) => {
       if (
         senderInfo.address === NetUtils.getMyLocalIPv4() ||

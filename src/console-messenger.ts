@@ -1,25 +1,24 @@
-import { IConfigurationLoader } from "./config/argparse.config";
-import {
-  BroadcastCommunication,
-  CommunicationEvent,
-} from "./communication/broadcast.communication";
+import { BroadcastCommunication } from "./communication/broadcast.communication";
 import readline from "readline";
 import { stdin, stdout } from "process";
-import { CryptoCodec } from "./cryptography/cipher.crypto";
 import { NetUtils } from "./utils/net.utils";
+import { Cryptography } from "./cryptography/cyptography";
+import { CommunicationEvent } from "./communication/communication.enum";
+import { Configuration } from "./configuration/configuration";
+import { Communication } from "./communication/communication";
 const rl = readline.createInterface(stdin, stdout);
 export class ConsoleMessenger {
-  private config: IConfigurationLoader;
-  private communication: BroadcastCommunication;
-  private crypto: CryptoCodec;
+  private config: Configuration;
+  private communication: Communication;
+  private crypto: Cryptography;
 
   constructor(
-    ConfigClass: new () => IConfigurationLoader,
-    CryptoClass: new () => CryptoCodec,
+    ConfigClass: new () => Configuration,
+    CryptoClass: new () => Cryptography,
     CommunicationClass: new (
-      crypto: CryptoCodec,
-      config: IConfigurationLoader
-    ) => BroadcastCommunication
+      crypto: Cryptography,
+      config: Configuration
+    ) => Communication
   ) {
     this.config = new ConfigClass();
     this.crypto = new CryptoClass();
