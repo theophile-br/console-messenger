@@ -1,8 +1,12 @@
-import { ArgParseConfig } from "./argparse.config";
-import { BroadcastCommunication } from "./broadcast.communication";
+import { ArgParseConfig } from "./config/argparse.config";
+import { BroadcastCommunication } from "./communication/broadcast.communication";
 import { ConsoleMessenger } from "./console-messenger";
-import { CipherCrypto } from "./cipher.crypto";
+import { CipherCrypto } from "./cryptography/cipher.crypto";
 
-const app = new ConsoleMessenger( ArgParseConfig, BroadcastCommunication, CipherCrypto);
+const app = new ConsoleMessenger(
+  ArgParseConfig,
+  CipherCrypto,
+  BroadcastCommunication
+);
 
-app.start()
+app.start();
