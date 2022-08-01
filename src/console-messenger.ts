@@ -1,4 +1,3 @@
-import { BroadcastCommunication } from "./communication/broadcast.communication";
 import readline from "readline";
 import { stdin, stdout } from "process";
 import { NetUtils } from "./utils/net.utils";
@@ -6,13 +5,16 @@ import { Cryptography } from "./cryptography/cyptography";
 import { CommunicationEvent } from "./communication/communication.enum";
 import { Configuration } from "./configuration/configuration";
 import { Communication } from "./communication/communication";
+import { Displayer } from "./displayer/displayer";
 const rl = readline.createInterface(stdin, stdout);
 export class ConsoleMessenger {
   private config: Configuration;
   private communication: Communication;
   private crypto: Cryptography;
+  private displayer: Displayer;
 
   constructor(
+    DisplayerClass: new () => Displayer,
     ConfigClass: new () => Configuration,
     CryptoClass: new () => Cryptography,
     CommunicationClass: new (
@@ -20,13 +22,19 @@ export class ConsoleMessenger {
       config: Configuration
     ) => Communication
   ) {
+    this.displayer = new DisplayerClass();
     this.config = new ConfigClass();
     this.crypto = new CryptoClass();
     this.communication = new CommunicationClass(this.crypto, this.config);
   }
 
   public async start(): Promise<void> {
-    this.config.load();
+    try {
+      this.config.load();
+    } catch (err: any) {
+      this.displayer.print(err.message);
+      process.exit();
+    }
     rl.on("line", (data: string) => this.onEnter(data));
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
@@ -36,31 +44,33 @@ export class ConsoleMessenger {
         readline.clearLine(process.stdin, 0);
         readline.cursorTo(process.stdin, 0);
         rl.pause();
-        console.log(message);
+        this.displayer.print(message);
         rl.write(mem);
         rl.resume();
       }
     );
 
     this.communication.event.on(CommunicationEvent.CLOSE, () => {
-      console.log("program stop");
+      this.displayer.print("program stop");
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.CLOSE, (err) => {
-      console.log(`server error:\n${err.stack}`);
+      this.displayer.print(`server error:\n${err.stack}`);
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.LISTENING, () => {
       console.clear();
       if (this.config.room !== "") {
-        console.log(`Enter un room ${this.config.room}`);
+        this.displayer.print(`Enter un room ${this.config.room}`);
       }
-      console.log(
+      this.displayer.print(
         `My Local adresse IP is ${NetUtils.getMyLocalIPv4()}/${NetUtils.getMyLocalIPv4Mask()}`
       );
-      console.log(`My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`);
+      this.displayer.print(
+        `My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`
+      );
       this.communication.netScan();
     });
   }
@@ -73,12 +83,13 @@ export class ConsoleMessenger {
       this.runCommande(data);
     } else {
       this.communication.sendMessage(data);
-      console.log(`${"YOU"} : ${data}`);
+      this.displayer.print(`${"YOU"} : ${data}`);
     }
   }
 
   private runCommande(data: string) {
     if (data === "/scan") {
+      this.displayer.print("scaning network please wait..");
       this.communication.netScan();
       return;
     }

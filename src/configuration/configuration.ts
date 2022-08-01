@@ -1,3 +1,5 @@
+import { EventEmitter } from "stream";
+
 export abstract class Configuration {
   pseudo?: string;
   room?: string;

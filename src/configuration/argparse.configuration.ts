@@ -1,3 +1,4 @@
+import { EventEmitter } from "stream";
 import { Configuration } from "./configuration";
 
 export class ArgParseConfig extends Configuration {
@@ -16,8 +17,7 @@ export class ArgParseConfig extends Configuration {
     this.silent = pos !== -1;
 
     if (!this.pseudo) {
-      console.log("missing args -p {{your-pseudo}}");
-      process.exit();
+      throw new Error("missing args -p {{your-pseudo}}");
     }
   }
 }

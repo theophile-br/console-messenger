@@ -81,11 +81,9 @@ export class BroadcastCommunication extends Communication {
   }
 
   public netScan(): void {
-    console.log("scaning network please wait..");
     const hash = this.crypto.encrypt(
       JSON.stringify({ code: CODE.HELLO, content: "" })
     );
     this.server.send(hash, this.port, NetUtils.getBroadcastIPv4());
-    console.log("\nWrite Something...\n");
   }
 }
