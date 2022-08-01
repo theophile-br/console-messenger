@@ -1,5 +1,4 @@
 import dgram from "dgram";
-import { EventEmitter } from "stream";
 import { Configuration } from "../configuration/configuration";
 import { Cryptography } from "../cryptography/cyptography";
 import { NetUtils } from "../utils/net.utils";
@@ -43,7 +42,7 @@ export class BroadcastCommunication extends Communication {
         );
         return;
       }
-      this.event.emit(CommunicationEvent.MESSAGE, data);
+      this.event.emit(CommunicationEvent.MESSAGE, data.content);
     });
 
     this.server.on("listening", () => {

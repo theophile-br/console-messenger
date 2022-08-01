@@ -39,6 +39,7 @@ export class ConsoleMessenger {
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
       (message: string) => {
+        // TODO: Create "service" class for that
         const mem = rl.line;
         (rl as any).line = ""; //TODO: Change this ugly thing
         readline.clearLine(process.stdin, 0);
@@ -71,6 +72,7 @@ export class ConsoleMessenger {
       this.displayer.print(
         `My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`
       );
+      this.displayer.print("scaning network please wait..");
       this.communication.netScan();
     });
   }
@@ -82,6 +84,9 @@ export class ConsoleMessenger {
     if (data[0] === "/") {
       this.runCommande(data);
     } else {
+      if (this.config.silent) {
+        console.log("\u0007");
+      }
       this.communication.sendMessage(data);
       this.displayer.print(`${"YOU"} : ${data}`);
     }
