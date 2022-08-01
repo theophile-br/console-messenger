@@ -28,7 +28,8 @@ export class BroadcastCommunication extends Communication {
       if (!this.carnet.includes(senderInfo.address)) {
         this.carnet.push(senderInfo.address);
       }
-      const data = JSON.parse(this.crypto.decrypt("" + buf));
+      const dataDecrypt = this.crypto.decrypt("" + buf);
+      const data = JSON.parse(dataDecrypt);
       if (data.code === CODE.HELLO) {
         this.server.send(
           this.crypto.encrypt(

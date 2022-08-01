@@ -35,6 +35,6 @@ export class CipherCrypto extends Cryptography {
       decipher.update(Buffer.from(hash.content, "hex")),
       decipher.final(),
     ]);
-    return JSON.parse(decripted.toString());
+    return decripted.toString();
   }
 }
