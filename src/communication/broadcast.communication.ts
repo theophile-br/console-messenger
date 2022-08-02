@@ -2,8 +2,8 @@ import dgram from "dgram";
 import { Configuration } from "../configuration/configuration";
 import { Cryptography } from "../cryptography/cyptography";
 import { NetUtils } from "../utils/net.utils";
-import { Communication } from "./communication";
 import { CommunicationEvent } from "./communication.enum";
+import { Communication } from "./communication";
 
 const CODE = {
   HELLO: "HELLO",
@@ -15,8 +15,8 @@ export class BroadcastCommunication extends Communication {
   private port = 41234;
   private carnet: string[] = [];
 
-  constructor(crypto: Cryptography, config: Configuration) {
-    super(crypto, config);
+  constructor(private crypto: Cryptography, private config: Configuration) {
+    super();
     this.server.on("message", (buf, senderInfo) => {
       if (
         senderInfo.address === NetUtils.getMyLocalIPv4() ||

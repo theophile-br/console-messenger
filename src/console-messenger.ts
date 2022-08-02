@@ -4,29 +4,16 @@ import { NetUtils } from "./utils/net.utils";
 import { Cryptography } from "./cryptography/cyptography";
 import { CommunicationEvent } from "./communication/communication.enum";
 import { Configuration } from "./configuration/configuration";
-import { Communication } from "./communication/communication";
 import { Displayer } from "./displayer/displayer";
+import { Communication } from "./communication/communication";
 const rl = readline.createInterface(stdin, stdout);
 export class ConsoleMessenger {
-  private config: Configuration;
-  private communication: Communication;
-  private crypto: Cryptography;
-  private displayer: Displayer;
-
   constructor(
-    DisplayerClass: new () => Displayer,
-    ConfigClass: new () => Configuration,
-    CryptoClass: new () => Cryptography,
-    CommunicationClass: new (
-      crypto: Cryptography,
-      config: Configuration
-    ) => Communication
-  ) {
-    this.displayer = new DisplayerClass();
-    this.config = new ConfigClass();
-    this.crypto = new CryptoClass();
-    this.communication = new CommunicationClass(this.crypto, this.config);
-  }
+    private config: Configuration,
+    private communication: Communication,
+    private crypto: Cryptography,
+    private displayer: Displayer
+  ) {}
 
   public async start(): Promise<void> {
     try {
