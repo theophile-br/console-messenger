@@ -1,7 +1,7 @@
-import { Displayer } from "./displayer";
+import { Display } from "./display";
 import { UserInput } from "../user-input/user-input";
 
-export class ConsoleDisplayer implements Displayer {
+export class ConsoleDisplay implements Display {
   constructor(private userInput: UserInput) {}
 
   public receiveMessage(message: string): string {

@@ -1,7 +1,7 @@
 import { NetUtils } from "./utils/net.utils";
 import { CommunicationEvent } from "./communication/communication.enum";
 import { Configuration } from "./configuration/configuration";
-import { Displayer } from "./displayer/displayer";
+import { Display } from "./display/display";
 import { Communication } from "./communication/communication";
 import { UserInput } from "./user-input/user-input";
 import { UserInputEvent } from "./user-input/user-input.enum";
@@ -10,7 +10,7 @@ export class ConsoleMessenger {
   constructor(
     private config: Configuration,
     private communication: Communication,
-    private displayer: Displayer,
+    private display: Display,
     private userInput: UserInput,
     private audioSystem: AudioSystem
   ) {}
@@ -19,7 +19,7 @@ export class ConsoleMessenger {
     try {
       this.config.load();
     } catch (err: any) {
-      this.displayer.print(err.message);
+      this.display.print(err.message);
       process.exit();
     }
     this.userInput.event.on(UserInputEvent.ENTER_KEYDOWN, (data: string) =>
@@ -28,32 +28,30 @@ export class ConsoleMessenger {
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
       (message: string) => {
-        this.displayer.receiveMessage(message);
+        this.display.receiveMessage(message);
       }
     );
 
     this.communication.event.on(CommunicationEvent.CLOSE, () => {
-      this.displayer.print("program stop");
+      this.display.print("program stop");
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.CLOSE, (err) => {
-      this.displayer.print(`server error:\n${err.stack}`);
+      this.display.print(`server error:\n${err.stack}`);
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.LISTENING, () => {
       console.clear();
       if (this.config.room !== "") {
-        this.displayer.print(`Enter un room ${this.config.room}`);
+        this.display.print(`Enter un room ${this.config.room}`);
       }
-      this.displayer.print(
+      this.display.print(
         `My Local adresse IP is ${NetUtils.getMyLocalIPv4()}/${NetUtils.getMyLocalIPv4Mask()}`
       );
-      this.displayer.print(
-        `My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`
-      );
-      this.displayer.print("scaning network please wait..");
+      this.display.print(`My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`);
+      this.display.print("scaning network please wait..");
       this.communication.netScan();
     });
   }
@@ -68,13 +66,13 @@ export class ConsoleMessenger {
         this.audioSystem.bell();
       }
       this.communication.sendMessage(data);
-      this.displayer.print(`${"YOU"} : ${data}`);
+      this.display.print(`${"YOU"} : ${data}`);
     }
   }
 
   private runCommande(data: string) {
     if (data === "/scan") {
-      this.displayer.print("scaning network please wait..");
+      this.display.print("scaning network please wait..");
       this.communication.netScan();
       return;
     }
