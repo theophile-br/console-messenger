@@ -1,6 +1,6 @@
 import dgram from "dgram";
 import { Configuration } from "../configuration/configuration";
-import { Cryptography } from "../cryptography/cyptography";
+import { Cryptography } from "../cryptography/cryptography";
 import { NetUtils } from "../utils/net.utils";
 import { CommunicationEvent } from "./communication.enum";
 import { Communication } from "./communication";

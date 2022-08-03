@@ -31,10 +31,10 @@ export class CipherCrypto implements Cryptography {
       this.SECRET_KEY,
       Buffer.from(hash.iv, "hex")
     );
-    const decripted = Buffer.concat([
+    const decrypted = Buffer.concat([
       decipher.update(Buffer.from(hash.content, "hex")),
       decipher.final(),
     ]);
-    return decripted.toString();
+    return decrypted.toString();
   }
 }
