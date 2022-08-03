@@ -1,10 +1,10 @@
-import { UserInput } from "./user-input";
+import { IUserInput } from "./user-input.interface";
 import readline from "readline";
 import { stdin, stdout } from "process";
 import { EventEmitter } from "stream";
 import { UserInputEvent } from "./user-input.enum";
 
-export class ConsoleUserInput implements UserInput {
+export class ConsoleUserInput implements IUserInput {
   public cursorPosition: number = 0;
   public memory: string = "";
   public readonly event: EventEmitter = new EventEmitter();

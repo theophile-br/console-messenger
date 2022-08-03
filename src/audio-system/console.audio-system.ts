@@ -1,6 +1,6 @@
-import { AudioSystem } from "./audio-system";
+import { IAudioSystem } from "./audio-system.interface";
 
-export class ConsoleAudioSystem implements AudioSystem {
+export class ConsoleAudioSystem implements IAudioSystem {
   bell(): void {
     process.stdout.write("\x07");
   }

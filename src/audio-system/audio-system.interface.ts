@@ -1,4 +1,4 @@
-export interface AudioSystem {
+export interface IAudioSystem {
   bell(): void;
   play(): void;
 }

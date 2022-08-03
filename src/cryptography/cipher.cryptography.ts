@@ -1,13 +1,13 @@
 import crypto from "crypto";
 import { SecretWordExceedThe32CharLimitError } from "./cipher.cryptography.error";
-import { Cryptography as Cryptography } from "./cryptography";
+import { ICryptography as ICryptography } from "./cryptography.interface";
 
 type CipherData = {
   iv: string;
   content: string;
 };
 
-export class CipherCrypto implements Cryptography {
+export class CipherCrypto implements ICryptography {
   private algorithm = "aes-256-ctr";
   private SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rgsd01LwHzfR3";
   private iv = crypto.randomBytes(16);

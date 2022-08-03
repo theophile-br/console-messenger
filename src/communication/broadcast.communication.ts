@@ -1,9 +1,9 @@
 import dgram from "dgram";
-import { Configuration } from "../configuration/configuration";
-import { Cryptography } from "../cryptography/cryptography";
+import { IConfiguration } from "../configuration/configuration.interface";
+import { ICryptography } from "../cryptography/cryptography.interface";
 import { NetUtils } from "../utils/net.utils";
 import { CommunicationEvent } from "./communication.enum";
-import { Communication } from "./communication";
+import { ICommunication } from "./communication.interface";
 import { EventEmitter } from "stream";
 
 const CODE = {
@@ -11,13 +11,13 @@ const CODE = {
   MESSAGE: "MSG",
 };
 
-export class BroadcastCommunication implements Communication {
+export class BroadcastCommunication implements ICommunication {
   private server = dgram.createSocket("udp4");
   private port = 41234;
   private carnet: string[] = [];
   public readonly event: EventEmitter = new EventEmitter();
 
-  constructor(private crypto: Cryptography, private config: Configuration) {
+  constructor(private crypto: ICryptography, private config: IConfiguration) {
     this.server.on("message", (buf, senderInfo) => {
       if (
         senderInfo.address === NetUtils.getMyLocalIPv4() ||

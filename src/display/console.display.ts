@@ -1,8 +1,8 @@
-import { Display } from "./display";
-import { UserInput } from "../user-input/user-input";
+import { IDisplay } from "./display.interface";
+import { IUserInput } from "../user-input/user-input.interface";
 
-export class ConsoleDisplay implements Display {
-  constructor(private userInput: UserInput) {}
+export class ConsoleDisplay implements IDisplay {
+  constructor(private userInput: IUserInput) {}
 
   public receiveMessage(message: string): string {
     this.userInput.cut();

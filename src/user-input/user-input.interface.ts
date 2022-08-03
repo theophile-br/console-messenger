@@ -1,6 +1,6 @@
 import { EventEmitter } from "stream";
 
-export interface UserInput {
+export interface IUserInput {
   memory: string;
   cursorPosition: number;
   readonly event: EventEmitter;

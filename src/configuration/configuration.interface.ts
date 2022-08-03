@@ -1,4 +1,4 @@
-export interface Configuration {
+export interface IConfiguration {
   pseudo?: string;
   room?: string;
   silent?: boolean;

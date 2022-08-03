@@ -1,7 +1,7 @@
 import { RequireArgParamsError } from "./argparse.configuration.error";
-import { Configuration } from "./configuration";
+import { IConfiguration } from "./configuration.interface";
 
-export class ArgParseConfig implements Configuration {
+export class ArgParseConfig implements IConfiguration {
   pseudo?: string;
   room?: string;
   silent?: boolean;

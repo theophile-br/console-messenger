@@ -1,18 +1,18 @@
 import { NetUtils } from "./utils/net.utils";
 import { CommunicationEvent } from "./communication/communication.enum";
-import { Configuration } from "./configuration/configuration";
-import { Display } from "./display/display";
-import { Communication } from "./communication/communication";
-import { UserInput } from "./user-input/user-input";
+import { IConfiguration } from "./configuration/configuration.interface";
+import { IDisplay } from "./display/display.interface";
+import { ICommunication } from "./communication/communication.interface";
+import { IUserInput } from "./user-input/user-input.interface";
 import { UserInputEvent } from "./user-input/user-input.enum";
-import { AudioSystem } from "./audio-system/audio-system";
+import { IAudioSystem } from "./audio-system/audio-system.interface";
 export class ConsoleMessenger {
   constructor(
-    private config: Configuration,
-    private communication: Communication,
-    private display: Display,
-    private userInput: UserInput,
-    private audioSystem: AudioSystem
+    private config: IConfiguration,
+    private communication: ICommunication,
+    private display: IDisplay,
+    private userInput: IUserInput,
+    private audioSystem: IAudioSystem
   ) {}
 
   public async start(): Promise<void> {
