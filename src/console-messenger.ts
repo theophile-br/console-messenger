@@ -1,18 +1,17 @@
-import readline from "readline";
-import { stdin, stdout } from "process";
 import { NetUtils } from "./utils/net.utils";
 import { Cryptography } from "./cryptography/cyptography";
 import { CommunicationEvent } from "./communication/communication.enum";
 import { Configuration } from "./configuration/configuration";
 import { Displayer } from "./displayer/displayer";
 import { Communication } from "./communication/communication";
-const rl = readline.createInterface(stdin, stdout);
+import { UserInput } from "./user-input/user-input";
+import { UserInputEvent } from "./user-input/user-input.enum";
 export class ConsoleMessenger {
   constructor(
     private config: Configuration,
     private communication: Communication,
-    private crypto: Cryptography,
-    private displayer: Displayer
+    private displayer: Displayer,
+    private userInput: UserInput
   ) {}
 
   public async start(): Promise<void> {
@@ -22,19 +21,13 @@ export class ConsoleMessenger {
       this.displayer.print(err.message);
       process.exit();
     }
-    rl.on("line", (data: string) => this.onEnter(data));
+    this.userInput.event.on(UserInputEvent.ENTER_KEYDOWN, (data: string) =>
+      this.onEnter(data)
+    );
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
       (message: string) => {
-        // TODO: Create "service" class for that
-        const mem = rl.line;
-        (rl as any).line = ""; //TODO: Change this ugly thing
-        readline.clearLine(process.stdin, 0);
-        readline.cursorTo(process.stdin, 0);
-        rl.pause();
-        this.displayer.print(message);
-        rl.write(mem);
-        rl.resume();
+        this.displayer.receiveMessage(message);
       }
     );
 
@@ -65,8 +58,7 @@ export class ConsoleMessenger {
   }
 
   private onEnter(data: string) {
-    readline.moveCursor(process.stdin, 0, -1);
-    readline.clearLine(process.stdin, 0);
+    this.userInput.clearLine();
 
     if (data[0] === "/") {
       this.runCommande(data);

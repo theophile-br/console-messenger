@@ -6,7 +6,7 @@ type CipherData = {
   content: string;
 };
 
-export class CipherCrypto extends Cryptography {
+export class CipherCrypto implements Cryptography {
   private algorithm = "aes-256-ctr";
   private SECRET_KEY = "vOVH6sAzeNWjRRIqCc7rgsd01LwHzfR3";
   private iv = crypto.randomBytes(16);

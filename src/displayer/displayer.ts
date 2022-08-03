@@ -1,5 +1,4 @@
-export abstract class Displayer {
-  public print(data: string): string {
-    throw new Error("Method Not Implemented");
-  }
+export interface Displayer {
+  print(data: string): string;
+  receiveMessage(data: string): string;
 }

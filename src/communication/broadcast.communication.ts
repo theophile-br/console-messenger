@@ -4,19 +4,20 @@ import { Cryptography } from "../cryptography/cyptography";
 import { NetUtils } from "../utils/net.utils";
 import { CommunicationEvent } from "./communication.enum";
 import { Communication } from "./communication";
+import { EventEmitter } from "stream";
 
 const CODE = {
   HELLO: "HELLO",
   MESSAGE: "MSG",
 };
 
-export class BroadcastCommunication extends Communication {
+export class BroadcastCommunication implements Communication {
   private server = dgram.createSocket("udp4");
   private port = 41234;
   private carnet: string[] = [];
+  public readonly event: EventEmitter = new EventEmitter();
 
   constructor(private crypto: Cryptography, private config: Configuration) {
-    super();
     this.server.on("message", (buf, senderInfo) => {
       if (
         senderInfo.address === NetUtils.getMyLocalIPv4() ||

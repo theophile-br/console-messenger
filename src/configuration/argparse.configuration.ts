@@ -1,7 +1,6 @@
-import { EventEmitter } from "stream";
 import { Configuration } from "./configuration";
 
-export class ArgParseConfig extends Configuration {
+export class ArgParseConfig implements Configuration {
   pseudo?: string;
   room?: string;
   silent?: boolean;
