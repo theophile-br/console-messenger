@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Cryptography as Cryptography } from "./cyptography";
+import { Cryptography as Cryptography } from "./cryptography";
 
 type CipherData = {
   iv: string;

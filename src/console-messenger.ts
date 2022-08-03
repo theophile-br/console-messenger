@@ -60,7 +60,7 @@ export class ConsoleMessenger {
     this.userInput.clearLine();
 
     if (data[0] === "/") {
-      this.runCommande(data);
+      this.runCommand(data);
     } else {
       if (this.config.silent) {
         this.audioSystem.bell();
@@ -70,7 +70,7 @@ export class ConsoleMessenger {
     }
   }
 
-  private runCommande(data: string) {
+  private runCommand(data: string) {
     if (data === "/scan") {
       this.display.print("scaning network please wait..");
       this.communication.netScan();

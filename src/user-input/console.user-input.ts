@@ -18,7 +18,7 @@ export class ConsoleUserInput implements UserInput {
 
   cut(): void {
     this.memory = this.rl.line;
-    (this.rl as any).line = ""; //TODO: Change this ugly thing
+    (this.rl as any).line = "";
     readline.clearLine(process.stdin, 0);
     readline.cursorTo(process.stdin, 0);
     this.rl.pause();
