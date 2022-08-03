@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { SecretWordExceedThe32CharLimitError } from "./cipher.cryptography.error";
 import { Cryptography as Cryptography } from "./cryptography";
 
 type CipherData = {
@@ -36,5 +37,16 @@ export class CipherCrypto implements Cryptography {
       decipher.final(),
     ]);
     return decrypted.toString();
+  }
+
+  setupSecret(word: string): string {
+    const sizeOfWord = word.length;
+    if (sizeOfWord > 32) {
+      throw new SecretWordExceedThe32CharLimitError();
+    }
+    this.SECRET_KEY =
+      word + this.SECRET_KEY.slice(word.length, this.SECRET_KEY.length);
+
+    return this.SECRET_KEY;
   }
 }
