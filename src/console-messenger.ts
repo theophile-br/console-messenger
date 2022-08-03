@@ -1,17 +1,18 @@
 import { NetUtils } from "./utils/net.utils";
-import { Cryptography } from "./cryptography/cyptography";
 import { CommunicationEvent } from "./communication/communication.enum";
 import { Configuration } from "./configuration/configuration";
 import { Displayer } from "./displayer/displayer";
 import { Communication } from "./communication/communication";
 import { UserInput } from "./user-input/user-input";
 import { UserInputEvent } from "./user-input/user-input.enum";
+import { AudioSystem } from "./audio-system/audio-system";
 export class ConsoleMessenger {
   constructor(
     private config: Configuration,
     private communication: Communication,
     private displayer: Displayer,
-    private userInput: UserInput
+    private userInput: UserInput,
+    private audioSystem: AudioSystem
   ) {}
 
   public async start(): Promise<void> {
@@ -64,7 +65,7 @@ export class ConsoleMessenger {
       this.runCommande(data);
     } else {
       if (this.config.silent) {
-        console.log("\u0007");
+        this.audioSystem.bell();
       }
       this.communication.sendMessage(data);
       this.displayer.print(`${"YOU"} : ${data}`);
