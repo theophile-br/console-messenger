@@ -11,6 +11,6 @@ module.exports = {
     filename: 'console-messenger.js',
   },
   optimization: {
-    minimize: false, // enabling this reduces file size and readability
+    minimize: true, // enabling this reduces file size and readability
   },
 };
