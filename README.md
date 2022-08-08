@@ -1,6 +1,8 @@
 <h1> <img src="assets/logo.png" width="20px"/> Console Messenger</h1>
 
-Console Messenger is a **console**, **lightweight**, **local**, **encrypted** and **real time** chat application.
+Console Messenger is a **console**, **lightweight**, **local**, **encrypted** and **real time** chat application on localnetwork.
+
+You can find a ready to use version with NodeJS [here](https://github.com/theophile-br/console-messenger/tree/release)
 
 # Build
 
@@ -8,8 +10,6 @@ Console Messenger is a **console**, **lightweight**, **local**, **encrypted** an
 npm i
 npm run package
 ```
-
-The program is available in the **bundle** directory.
 
 # Execute
 
