@@ -28,6 +28,9 @@ export class ConsoleMessenger {
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
       (message: string) => {
+        if (this.config.silent) {
+          this.audioSystem.bell();
+        }
         this.display.receiveMessage(message);
       }
     );
@@ -62,9 +65,6 @@ export class ConsoleMessenger {
     if (data[0] === "/") {
       this.runCommand(data);
     } else {
-      if (this.config.silent) {
-        this.audioSystem.bell();
-      }
       this.communication.sendMessage(data);
       this.display.print(`${"YOU"} : ${data}`);
     }
