@@ -1,8 +1,10 @@
 <h1> <img src="assets/logo.png" width="20px"/> Console Messenger</h1>
 
-Console Messenger is a **console**, **lightweight**, **local**, **encrypted** and **real time** chat application on localnetwork.
+Console Messenger is a **NodeJS**, **console**, **lightweight**, **local**, **encrypted** and **real time** chat application on localnetwork.
 
-You can find a ready to use version with NodeJS [here](https://github.com/theophile-br/console-messenger/tree/release)
+You have to download [NodeJS](https://nodejs.org/en/download/)
+
+You can find a ready to use version [here](https://github.com/theophile-br/console-messenger/tree/release)
 
 # Build
 
@@ -14,7 +16,7 @@ npm run package
 # Execute
 
 ```bash
-node bundle/console-messenger.js -p {{pseudo}}
+node bundle/cm.js -p {{pseudo}}
 ```
 
 # How it work ?
