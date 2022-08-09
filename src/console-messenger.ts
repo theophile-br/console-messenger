@@ -41,7 +41,7 @@ export class ConsoleMessenger {
     });
 
     this.communication.event.on(CommunicationEvent.CLOSE, (err) => {
-      this.display.print(`Derver error:\n${err.stack}`);
+      this.display.print(`Server error:\n${err.stack}`);
       process.exit();
     });
 
