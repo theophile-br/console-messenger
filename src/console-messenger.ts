@@ -36,12 +36,12 @@ export class ConsoleMessenger {
     );
 
     this.communication.event.on(CommunicationEvent.CLOSE, () => {
-      this.display.print("program stop");
+      this.display.print("Program stop");
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.CLOSE, (err) => {
-      this.display.print(`server error:\n${err.stack}`);
+      this.display.print(`Derver error:\n${err.stack}`);
       process.exit();
     });
 
@@ -51,10 +51,10 @@ export class ConsoleMessenger {
         this.display.print(`Enter un room ${this.config.room}`);
       }
       this.display.print(
-        `My Local adresse IP is ${NetUtils.getMyLocalIPv4()}/${NetUtils.getMyLocalIPv4Mask()}`
+        `My Local address IP is ${NetUtils.getMyLocalIPv4()}/${NetUtils.getMyLocalIPv4Mask()}`
       );
       this.display.print(`My BroadcastAddr is ${NetUtils.getBroadcastIPv4()}`);
-      this.display.print("scaning network please wait..");
+      this.display.print("Scanning network please wait..");
       this.communication.netScan();
     });
   }
@@ -72,7 +72,7 @@ export class ConsoleMessenger {
 
   private runCommand(data: string) {
     if (data === "/scan") {
-      this.display.print("scaning network please wait..");
+      this.display.print("Scanning network please wait..");
       this.communication.netScan();
       return;
     }
