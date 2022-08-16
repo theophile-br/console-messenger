@@ -16,6 +16,7 @@ const display = new ConsoleDisplay(userInput);
 const app = new ConsoleMessenger(
   config,
   communication,
+  crypto,
   display,
   userInput,
   audioSystem

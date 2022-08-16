@@ -6,25 +6,44 @@ import { ICommunication } from "./communication/communication.interface";
 import { IUserInput } from "./user-input/user-input.interface";
 import { UserInputEvent } from "./user-input/user-input.enum";
 import { IAudioSystem } from "./audio-system/audio-system.interface";
+import { ICryptography } from "./cryptography/cryptography.interface";
+import { CipherCrypto } from "./cryptography/cipher.cryptography";
+
+export type UserInfo = {
+  pseudo: string;
+  ip: string;
+};
+
+export type UserMessage = {
+  user: UserInfo;
+  message: string;
+};
+
 export class ConsoleMessenger {
   constructor(
     private config: IConfiguration,
     private communication: ICommunication,
+    private crypto: ICryptography,
     private display: IDisplay,
     private userInput: IUserInput,
     private audioSystem: IAudioSystem
   ) {}
 
   public async start(): Promise<void> {
+    // Load Config
     try {
       this.config.load();
-    } catch (err: any) {
-      this.display.print(err.message);
+    } catch (err) {
+      this.display.print((err as Error).message);
       process.exit();
     }
+
+    // User Keyboard Event
     this.userInput.event.on(UserInputEvent.ENTER_KEYDOWN, (data: string) =>
       this.onEnter(data)
     );
+
+    // Event Listening
     this.communication.event.on(
       CommunicationEvent.MESSAGE,
       (message: string) => {
@@ -40,15 +59,18 @@ export class ConsoleMessenger {
       process.exit();
     });
 
-    this.communication.event.on(CommunicationEvent.CLOSE, (err) => {
+    this.communication.event.on(CommunicationEvent.ERROR, (err) => {
       this.display.print(`Server error:\n${err.stack}`);
       process.exit();
     });
 
     this.communication.event.on(CommunicationEvent.LISTENING, () => {
       console.clear();
-      if (this.config.room !== "") {
-        this.display.print(`Enter un room ${this.config.room}`);
+      if (this.config.room) {
+        this.display.print(`Enter in room ${this.config.room}`);
+        if (this.crypto instanceof CipherCrypto) {
+          this.crypto.setupSecret(this.config.room);
+        }
       }
       this.display.print(
         `My Local address IP is ${NetUtils.getMyLocalIPv4()}/${NetUtils.getMyLocalIPv4Mask()}`
